@@ -1,0 +1,124 @@
+﻿@page "/yourwall"
+@using FirstBlazorApp.Data;
+@layout ShoppingListLayout;
+<h3>Wall</h3>
+
+
+<EditForm Model="@MyLayout" OnSubmit="AddLayout">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <thead>
+    <tr>
+       <th><label>Input what is the layout </label></th> 
+       <th><InputText @bind-Value="MyLayout.Name" /></th>
+    </tr>
+    <tr>
+       <th><label>Input how thick is the layout </label></th> 
+       <th><InputNumber  @bind-Value="MyLayout.Thick" /></th>
+       <th><label> mm </label></th>
+    </tr>
+    <tr>
+        <th><label>Input the value of lambda factor </label></th> 
+       <th><InputNumber  @bind-Value="MyLayout.Lambda" /></th>
+       <th><label>  W/(m*K) </label></th>
+    </tr>
+</thead>
+    <button type="submit">Add Layout</button>
+    <p></p>
+
+</EditForm>
+
+
+<table class="table table-sm">
+    <tr>
+        <th>Name</th>
+        <th>Thick [mm]</th>
+        <th>Lambda [W/(m*K)</th>
+        <th>Factor R [m^2K/W]</th>
+        <th></th>
+    </tr>
+    
+    @foreach(var lay in layouts)
+    {
+        <Item LayoutItem="@lay" />
+    }
+
+</table>
+
+
+<hr4> <th><label>The total R factor is: @FactorRSum [m^2K/W]  </label></th> </hr4>
+
+
+
+
+<EditForm Model="@wall" OnSubmit="AddWall">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <thead>
+    <tr>
+       <th><label>Input what is the name of this wall </label></th> 
+       <th><InputText @bind-Value="wall.NameW" /></th>
+    </tr>
+    </thead>
+    <button type="submit">Add Wall</button>
+</EditForm>
+
+<table class="table table-sm">
+    <tr>
+        <th>Name</th>
+        <th>Thick [mm]</th>
+        <th>Factor R [m^2K/W]</th>
+        <th></th>
+    </tr>
+    <tr>
+    @foreach(var wall in walls)
+    {
+        <Item WallItem="@wall" />
+    }
+    </tr>
+</table>
+
+@code {
+
+    public double FactorR = 0;
+    public double FactorRSum = 0;
+
+    List<Wall> walls = new();
+    public Wall wall = new();
+    public Layout MyLayout = new();
+    public List<Layout> layouts = new();
+   
+    public void UpdateTotalFactorR()
+    {
+        FactorRSum = layouts.Sum(x => x.FactorR);
+    }
+
+    private void AddLayout()
+    {
+
+        MyLayout.CalculateFR();
+        layouts.Add(MyLayout);
+        MyLayout = new();
+
+        UpdateTotalFactorR();
+    }
+
+    public void OnFactorRIncreased()
+    {
+        UpdateTotalFactorR();
+    }
+
+    private void AddWall()
+    {
+        foreach(var lay in layouts)
+        {
+            wall.layouts.Add(lay);
+            wall.FactorRW = layouts.Sum(x => x.FactorR);
+            wall.ThickW = layouts.Sum(x => x.Thick);
+            walls.Add(wall);
+            
+
+        }
+        wall = new();
+    }
+}

@@ -1,0 +1,33 @@
+﻿@using FirstBlazorApp.Data
+
+<tr>
+    <td>@LayoutItem.Name </td>
+    <td>@LayoutItem.Thick </td>
+    <td>@LayoutItem.Lambda </td>
+    <td>@LayoutItem.FactorR </td>
+</tr>
+
+<tr>
+    <td>@WallItem.NameW </td>
+    <td>@WallItem.ThickW </td>
+    <td>@WallItem.FactorRW </td>
+</tr>
+
+@code {
+
+    [Parameter]
+    public Layout LayoutItem { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnFactorRIncreased { get; set; }
+
+    private async Task AddFactorR()
+    {
+        LayoutItem.FactorR += 1;
+        await OnFactorRIncreased.InvokeAsync();
+    }
+
+    [Parameter]
+    public Wall WallItem { get; set; }
+
+}
